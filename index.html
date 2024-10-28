@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Interior Customization Form</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+    .form-container {
+        width: 400px;
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    label {
+        font-weight: bold;
+    }
+    select, button, input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        font-size: 16px;
+    }
+    #result {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #e2e8f0;
+        border-radius: 8px;
+    }
+</style>
+</head>
+<body>
+<div class="form-container">
+    <h2>Car Interior Customization</h2>
+    <div class="form-group">
+        <label for="carModel">Select Car Model:</label>
+        <select id="carModel">
+            <option value="sedan">Sedan</option>
+            <option value="offroad">Off-road</option>
+            <option value="muscle">Muscle</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="brakes">Brakes:</label>
+        <select id="brakes"></select>
+    </div>
+    <div class="form-group">
+        <label for="engine">Engine:</label>
+        <select id="engine"></select>
+    </div>
+    <div class="form-group">
+        <label for="suspension">Suspension:</label>
+        <select id="suspension"></select>
+    </div>
+    <div class="form-group">
+        <label for="transmission">Transmission:</label>
+        <select id="transmission"></select>
+    </div>
+    <div class="form-group">
+        <label for="turbo">Turbo:</label>
+        <select id="turbo">
+            <option value="8000">Upgraded - $8,000</option>
+        </select>
+    </div>
+    <button onclick="generateCode()">Generate Code</button>
+    <div id="result"></div>
+</div>
+
+<script>
+const customizationOptions = {
+    sedan: {
+        brakes: { 1: 2000, 2: 3000, 3: 6000 },
+        engine: { 1: 3000, 2: 2500, 3: 7000, 4: 9000 },
+        suspension: { 1: 1000, 2: 2000, 3: 3000, 4: 4000, 5: 5000 },
+        transmission: { 1: 2000, 2: 4000, 3: 6000, 4: 8000 },
+        turbo: "8000"
+    },
+    offroad: {
+        brakes: { 1: 2500, 2: 3500, 3: 6500 },
+        engine: { 1: 3500, 2: 3000, 3: 7500, 4: 9500 },
+        suspension: { 1: 1500, 2: 2500, 3: 3500, 4: 4500, 5: 5500 },
+        transmission: { 1: 2500, 2: 4500, 3: 6500, 4: 8500 },
+        turbo: "8000"
+    },
+    muscle: {
+        brakes: { 1: 2700, 2: 3700, 3: 6700 },
+        engine: { 1: 3600, 2: 2600, 3: 7600, 4: 9600 },
+        suspension: { 1: 1600, 2: 2600, 3: 3600, 4: 4600, 5: 5600 },
+        transmission: { 1: 2600, 2: 4600, 3: 6600, 4: 8600 },
+        turbo: "8000"
+    }
+};
+
+const costPrices = {
+    brakes: { 1: 1000, 2: 1500, 3: 3000 },
+    engine: { 1: 1500, 2: 2500, 3: 3500, 4: 4500 },
+    suspension: { 1: 500, 2: 1000, 3: 1500, 4: 2000, 5: 2500 },
+    transmission: { 1: 1000, 2: 2000, 3: 3000, 4: 4000 },
+    turbo: 4000,
+};
+
+document.getElementById('carModel').addEventListener('change', populateOptions);
+populateOptions();
+
+function populateOptions() {
+    const carModel = document.getElementById('carModel').value;
+    const options = customizationOptions[carModel];
+
+    populateDropdown('brakes', options.brakes);
+    populateDropdown('engine', options.engine);
+    populateDropdown('suspension', options.suspension);
+    populateDropdown('transmission', options.transmission);
+}
+
+function populateDropdown(elementId, items) {
+    const dropdown = document.getElementById(elementId);
+    dropdown.innerHTML = '';
+    for (const [key, value] of Object.entries(items)) {
+        dropdown.innerHTML += `<option value="${value}">Option ${key} - $${value}</option>`;
+    }
+}
+
+function generateCode() {
+    const carModel = document.getElementById('carModel').value;
+    const options = customizationOptions[carModel];
+
+    const selectedValues = {
+        brakes: { name: 'Brakes', value: document.getElementById('brakes').value },
+        engine: { name: 'Engine', value: document.getElementById('engine').value },
+        suspension: { name: 'Suspension', value: document.getElementById('suspension').value },
+        transmission: { name: 'Transmission', value: document.getElementById('transmission').value },
+        turbo: { name: 'Turbo', value: document.getElementById('turbo').value }
+    };
+
+    const jobDescription = Object.entries(selectedValues).map(([key, option]) => 
+        `${option.name} ${option.value}`
+    ).join(', ');
+
+    const price = Object.values(selectedValues).reduce((sum, val) => {
+        return sum + (val.key ? parseInt(options[val.name.toLowerCase()][val.key]) : parseInt(val.value));
+    }, 0);
+
+    const profit = price - (
+        (costPrices.brakes[selectedValues.brakes.value] || 0) +
+        (costPrices.engine[selectedValues.engine.value] || 0) +
+        (costPrices.suspension[selectedValues.suspension.value] || 0) +
+        (costPrices.transmission[selectedValues.transmission.value] || 0) +
+        costPrices.turbo
+    );
+    
+    const income = profit * 0.1;
+
+    document.getElementById('result').innerHTML = `
+        <div>
+Job Description: ${jobDescription}<br>
+Price: $${price}<br>
+Profit: $${profit}<br>
+Income: $${income.toFixed(2)}
+        </div>
+    `;
+}
+</script>
+</body>
+</html>
